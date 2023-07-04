@@ -80,7 +80,7 @@ def parse_rx(data: pd.DataFrame) -> pd.DataFrame:
 def del_rx(data: pd.DataFrame, col: str) -> pd.DataFrame:
     def _del(row):
         for rx in row["rx_to_del"]:
-            row["row"] = re.sub(rx, "", row["row"])
+            row["row"] = re.sub(rx, "", row["row"], flags=re.IGNORECASE)
         return row
 
     data["row"] = data[col].astype(str) + " "

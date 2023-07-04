@@ -1,12 +1,13 @@
 import pandas as pd
 import re
-import nltk
+import os
 
 from autosem.measures_extraction import MeasuresData
 
 
 def upload(filename: str):
-    filename = "C:\\Users\\tomilov-iv\\Desktop\\BrandPol\\data\\input\\" + filename
+    dir_path = os.path.dirname(__file__) + r"\data\input"
+    filename = dir_path + rf"\{filename}"
     if re.search(".xlsx$", filename):
         data = pd.read_excel(filename)
     elif re.search(".csv$", filename):
@@ -90,23 +91,20 @@ def get_semantic_template():
 
 
 def save(data: pd.DataFrame, filename: str) -> None:
-    if not re.match('\.xlsx$', filename):
-        filename += '.xlsx'
-    data.to_excel(
-        rf'C:\Users\tomilov-iv\Desktop\BrandPol\data\output\{filename}', 
-        index=False
-        )
+    dir_path = os.path.dirname(__file__) + r"\data\output"
+    filename = dir_path + rf"\{filename}"
+    data.to_excel(filename, index=False)
 
 
 def concat_rx(data: pd.DataFrame) -> pd.DataFrame:
     names = [
-        'Исключающее количество', 
-        'Исключающее количество (№)', 
-        'Количество', 
-        'Количество (№)',
-             ]
+        "Исключающее количество",
+        "Исключающее количество (№)",
+        "Количество",
+        "Количество (№)",
+    ]
     names.extend(MeasuresData().getNames())
     names = [name for name in names if name in list(data.columns)]
 
-    data['regex'] = data[names].agg(''.join, axis=1)
+    data["regex"] = data[names].agg("".join, axis=1)
     return data

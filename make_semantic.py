@@ -9,7 +9,7 @@ from autosem.word_extraction import *
 from autosem.measures_extraction import *
 from autosem.counts_extraction import *
 from autosem.cross_semantic import *
-from util import concat_rx
+from util import concat_rx, upload, save
 
 
 if __name__ == "__main__":
@@ -61,13 +61,13 @@ if __name__ == "__main__":
     )
 
     ruExtr = WordsExtractor(ru, expand_spaces=True)
-    engExrt = WordsExtractor(eng, expand_spaces=True)
+    engExtr = WordsExtractor(eng, expand_spaces=True)
     cross = CrosserPro([ru_cross, eng_cross])
     counts = CountsNoExtractor(excludeRX=True)
 
-    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\CommonSem.xlsx")
+    data = upload("farmaimpex.xlsx")
     data = ruExtr.extract(data, "Название")
-    data = engExrt.extract(data, "Название")
+    data = engExtr.extract(data, "Название")
     data = counts.extract(data, "Название")
 
     data = mass.extract(data, "Название")
@@ -78,4 +78,4 @@ if __name__ == "__main__":
     data = concat_rx(data)
     data = cross.extract(data, "Название")
 
-    data.to_excel("output.xlsx", index=False)
+    save(data, "farmaimpex.xlsx")
