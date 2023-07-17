@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import copy
+from tqdm import tqdm
 
 from autosem_funcs.cross_semantic_funcs import BasicCrosser
 from common import del_rx
@@ -210,13 +211,18 @@ class CrosserPro(Crosser):
             rule.join_words = False
         return rules
 
+    def _show_status(self):
+        print("Извелечение слов по кросс-семантике")
+
     def extract(self, data: pd.DataFrame, col: str):
+        self._show_status()
+
         data = self._setup(data)
         data = self._del_rx(data, col)
         data = self.get_tokens_pro(data, "row", self.extractors)
 
         indexes = set(data.index)
-        for index in indexes:
+        for index in tqdm(indexes):
             current_set = data.at[index, "tokens"]
             rest_indexes = indexes - set([index])  # can be profiled
 

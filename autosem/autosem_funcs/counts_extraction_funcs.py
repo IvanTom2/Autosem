@@ -8,7 +8,7 @@ def extractCounts(
 ) -> pd.Series:
     rx = r"(\d+)\s*?" + counts
 
-    countsValues = series.str.findall(rx)
+    countsValues = series.str.findall(rx, flags=re.IGNORECASE)
     countsValues = countsValues.apply(
         lambda _counts: [count for count in _counts if count != "1"]
     )
@@ -21,7 +21,7 @@ def excractNoCounts(
 ) -> pd.Series:
     rx = counts + r"\s*?(\d+)"
 
-    countsValues = series.str.findall(rx)
+    countsValues = series.str.findall(rx, flags=re.IGNORECASE)
     countsValues = countsValues.apply(
         lambda _counts: [count for count in _counts if count != "1"]
     )

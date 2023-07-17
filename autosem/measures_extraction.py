@@ -23,7 +23,8 @@ class MeasuresData(object):
         pass
 
     @property
-    def technique(self):
+    def memory(self):
+        _name = "Емкость памяти"
         prefix = ""
         postfix = ""
         measure_data = [
@@ -35,10 +36,11 @@ class MeasuresData(object):
                 "postfix": postfix,
             },
         ]
-        return measure_data
+        return _name, measure_data
 
     @property
     def concByMilliliter(self):
+        _name = "Концентрация в миллилитрах"
         prefix = ""
         postfix = ""
         measure_data = [
@@ -71,10 +73,11 @@ class MeasuresData(object):
                 "postfix": postfix,
             },
         ]
-        return measure_data
+        return _name, measure_data
 
     @property
     def concPercent(self):
+        _name = "Концентрация только в процентах"
         prefix = r""
         postfix = r""
         measure_data = [
@@ -86,10 +89,11 @@ class MeasuresData(object):
                 "postfix": postfix,
             },
         ]
-        return measure_data
+        return _name, measure_data
 
     @property
     def liquid(self):
+        _name = "Объем"
         prefix = r""
         postfix = r""
         measures_data = [
@@ -108,10 +112,11 @@ class MeasuresData(object):
                 "postfix": postfix,
             },
         ]
-        return measures_data
+        return _name, measures_data
 
     @property
     def mass(self):
+        _name = "Вес"
         prefix = r""
         postfix = r""
         measures_data = [
@@ -144,10 +149,11 @@ class MeasuresData(object):
                 "postfix": postfix,
             },
         ]
-        return measures_data
+        return _name, measures_data
 
     @property
     def ME(self):
+        _name = "Международные единицы"
         prefix = r""
         postfix = r""
         measures_data = [
@@ -173,14 +179,14 @@ class MeasuresData(object):
                 "postfix": postfix,
             },
         ]
-        return measures_data
+        return _name, measures_data
 
     def _getNames(self, measures):
         return [measure["name"] for measure in measures]
 
     def getNames(self):
         measures_types = [
-            self.technique,
+            self.memory,
             self.concByMilliliter,
             self.concPercent,
             self.liquid,
@@ -190,7 +196,7 @@ class MeasuresData(object):
 
         names = []
         for measures in measures_types:
-            names.extend(self._getNames(measures))
+            names.extend(self._getNames(measures[1]))
         return names
 
 
@@ -213,7 +219,8 @@ class MeasureExtractor(Extractor):
         max_values: int = 0,
         add_space: bool = True,
     ):
-        self.measure_data = measure_data
+        self._name = measure_data[0]
+        self.measure_data = measure_data[1]
         self.mode = mode
         self.max_values = max_values
         self.add_space = add_space
@@ -227,11 +234,15 @@ class MeasureExtractor(Extractor):
     def _add_space(self, series: pd.Series) -> pd.Series:
         return series + " " if self.add_space else series
 
+    def _show_status(self):
+        print("Извлекаю характеристики типа:", self._name)
+
     def extract(self, data: pd.DataFrame, col: str) -> pd.DataFrame:
         """
         return dataframe with extra columns which depend of
         name of the measures (from MeasuresData attribute)
         """
+        self._show_status()
 
         _data = self._add_space(data[col])
         measures = self._get_measures()

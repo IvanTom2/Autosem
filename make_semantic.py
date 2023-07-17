@@ -65,7 +65,8 @@ if __name__ == "__main__":
     cross = CrosserPro([ru_cross, eng_cross])
     counts = CountsNoExtractor(excludeRX=True)
 
-    data = upload("farmaimpex.xlsx")
+    # data = upload("farmaimpex.xlsx")
+    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\semantic_txt.xlsx")
     data = ruExtr.extract(data, "Название")
     data = engExtr.extract(data, "Название")
     data = counts.extract(data, "Название")
@@ -76,6 +77,7 @@ if __name__ == "__main__":
     data = concMl.extract(data, "Название")
 
     data = concat_rx(data)
-    data = cross.extract(data, "Название")
+    # data = cross.extract(data, "Название")
 
-    save(data, "farmaimpex.xlsx")
+    # save(data, "farmaimpex.xlsx")
+    data.to_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\katren_sem.xlsx", index=False)

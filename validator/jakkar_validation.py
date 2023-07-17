@@ -8,6 +8,14 @@ from collections import Counter
 from itertools import chain
 from tqdm.auto import tqdm
 from collections import namedtuple
+import numpy as np
+from sklearn.metrics import (
+    confusion_matrix,
+    precision_score,
+    recall_score,
+    accuracy_score,
+)
+
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -588,30 +596,32 @@ class FuzzyJakkarValidator(object):
 if __name__ == "__main__":
     weights_rules = RegexCustomWeights(
         caps=1,
-        capital=2,
+        capital=1,
         low=1,
         other=1,
         symbols="",
-        custom_boundary=r"\s",
+        # custom_boundary=r"\s",
     )
     tokenizer = RegexTokenizer(
-        {"english": 2, "russian": 1},
+        {"english": 1, "russian": 1},
         weights_rules=weights_rules,
     )
 
     validator = FuzzyJakkarValidator(
         tokenizer,
         word_min_length=3,
-        min_ratio=0.1,
-        max_ratio=0.5,
-        fuzzy_threshold=75,
+        uniq_max_value=1,
+        uniq_penalty=0,
+        min_ratio=0,
+        max_ratio=1,
+        fuzzy_threshold=80,
         count_mark_by="union",
         multiple_marks=False,
     )
 
     semantic, validation = upload_data(
         # semantic_path="/home/mainus/BrandPol/validator/semantic.csv",
-        validation_path=r"C:\Users\tomilov-iv\Desktop\BrandPol\validator\neknigi.xlsx",
+        validation_path=r"C:\Users\tomilov-iv\Desktop\BrandPol\text_neknigi.xlsx",
     )
 
     # validation = validation[:10]
@@ -622,4 +632,9 @@ if __name__ == "__main__":
         site_column="Строка валидации",
     )
 
-    result.to_excel("neknigi_jakkar_output.xlsx", index=False)
+    # result["_mark"] = np.where(result["mark"] >= 0.7, 1, 0)
+    # print("Accuracy =", round(accuracy_score(result["MyMark"], result["_mark"]), 4))
+    # print("Precision =", round(precision_score(result["MyMark"], result["_mark"]), 4))
+    # print("Recall =", round(recall_score(result["MyMark"], result["_mark"]), 4))
+
+    result.to_excel("text_neknigi_jakkar_output.xlsx", index=False)

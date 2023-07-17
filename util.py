@@ -6,6 +6,7 @@ from autosem.measures_extraction import MeasuresData
 
 
 def upload(filename: str):
+    print("Загружаю файл")
     dir_path = os.path.dirname(__file__) + r"\data\input"
     filename = dir_path + rf"\{filename}"
     if re.search(".xlsx$", filename):
@@ -91,6 +92,7 @@ def get_semantic_template():
 
 
 def save(data: pd.DataFrame, filename: str) -> None:
+    print("Сохраняю файл")
     dir_path = os.path.dirname(__file__) + r"\data\output"
     filename = dir_path + rf"\{filename}"
     data.to_excel(filename, index=False)
