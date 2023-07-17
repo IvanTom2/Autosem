@@ -66,12 +66,16 @@ def wordsFilter(
     return words
 
 
-def parse_rx(data: pd.DataFrame) -> pd.DataFrame:
-    data["rx_to_del"] = data["regex"].str.findall(r"\(\?\=\.\*.*?\)\)+")
-    data["rx_to_del"] = data["rx_to_del"].apply(
+def parse_rx(
+    data: pd.DataFrame,
+    extract_col: str = "regex",
+    new_col_name: str = "rx_to_del",
+) -> pd.DataFrame:
+    data[new_col_name] = data[extract_col].str.findall(r"\(\?\=\.\*.*?\)\)+")
+    data[new_col_name] = data[new_col_name].apply(
         lambda rxs: [re.sub(r"\(\?\=\.\*\(", "", rx) for rx in rxs]
     )
-    data["rx_to_del"] = data["rx_to_del"].apply(
+    data[new_col_name] = data[new_col_name].apply(
         lambda rxs: [re.sub(r"\)\)$", "", rx) for rx in rxs]
     )
     return data
