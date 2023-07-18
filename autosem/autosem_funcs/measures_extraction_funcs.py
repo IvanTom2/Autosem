@@ -222,8 +222,12 @@ def createSizeMeasureRX(
     )
 
     # TODO - добавить swap - смена характеристик местами
+    # measureValues = measureValues.apply(
+    #     lambda sizes: [f"\s*?(?:{measure})?\s*?{sep}".join(size) for size in sizes]
+    # )
+
     measureValues = measureValues.apply(
-        lambda sizes: [f"\s*?(?:{measure})?\s*?{sep}".join(size) for size in sizes]
+        lambda sizes: [f"?{sep}".join(size) for size in sizes]
     )
 
     return measureValues
