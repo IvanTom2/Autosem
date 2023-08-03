@@ -445,6 +445,14 @@ class FuzzyJakkarValidator(object):
         mark = try_count_mark(intersect, union)
         return mark
 
+    def _try_count_mark(self, intersect: set, union: set) -> float:
+        try:
+            mark = intersect / sum(self._find_ratio(union))
+        except Exception:
+            return 0
+        finally:
+            return mark
+
     def _count_multiple_marks(self, row: pd.Series) -> list[float]:
         intersect = row["ctokens"].intersection(row["stokens"])
 
@@ -455,7 +463,7 @@ class FuzzyJakkarValidator(object):
         ]
 
         _intersect = sum(self._find_ratio(intersect))
-        marks = [(_intersect / sum(self._find_ratio(union))) for union in unions]
+        marks = [self._try_count_mark(_intersect, union) for union in unions]
         return marks
 
     def _tokenize(
@@ -602,8 +610,12 @@ if __name__ == "__main__":
         symbols="",
         # custom_boundary=r"\s",
     )
+
     tokenizer = RegexTokenizer(
-        {"english": 1, "russian": 1},
+        {
+            "english": 1,
+            "russian": 1,
+        },
         weights_rules=weights_rules,
     )
 
@@ -614,21 +626,44 @@ if __name__ == "__main__":
         uniq_penalty=0,
         min_ratio=0,
         max_ratio=1,
-        fuzzy_threshold=80,
+        fuzzy_threshold=75,
         count_mark_by="union",
-        multiple_marks=False,
+        multiple_marks=True,
     )
 
-    semantic, validation = upload_data(
-        # semantic_path="/home/mainus/BrandPol/validator/semantic.csv",
-        validation_path=r"C:\Users\tomilov-iv\Desktop\BrandPol\text_neknigi.xlsx",
+    # semantic, validation = upload_data(
+    #     # semantic_path="/home/mainus/BrandPol/validator/semantic.csv",
+    #     validation_path=r"C:\Users\tomilov-iv\Desktop\BrandPol\raw.xlsx",
+    # )
+
+    semantic = pd.read_excel(
+        r"C:\Users\tomilov-iv\Desktop\ReadTown\NeKnigi\Rework v2\semantic\TextSearch\_Text_v3.xlsx"
+    )
+    validation = pd.read_excel(
+        r"C:\Users\tomilov-iv\Desktop\ReadTown\NeKnigi\Rework v2\validation\validation_text_v2_p1.xlsx"
+    )
+
+    sem_columns = [
+        "Поисковый запрос",
+        "Название",
+        "Название клиента",
+        "Ссылка на фото",
+        "type",
+    ]
+
+    merged = pd.merge(
+        validation,
+        semantic[sem_columns],
+        how="left",
+        left_on="Запрос",
+        right_on="Поисковый запрос",
     )
 
     # validation = validation[:10]
 
     result = validator.validate(
-        validation,
-        client_column="Название товара клиента",
+        merged,
+        client_column="Название клиента",
         site_column="Строка валидации",
     )
 
@@ -637,4 +672,4 @@ if __name__ == "__main__":
     # print("Precision =", round(precision_score(result["MyMark"], result["_mark"]), 4))
     # print("Recall =", round(recall_score(result["MyMark"], result["_mark"]), 4))
 
-    result.to_excel("text_neknigi_jakkar_output.xlsx", index=False)
+    result.to_csv("neknigi_jakkar_output1.csv", index=False, sep=";")

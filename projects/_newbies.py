@@ -40,7 +40,7 @@ if __name__ == "__main__":
     ruExtr = WordsExtractor(ru, expand_spaces=True)
     engExtr = WordsExtractor(eng, expand_spaces=True)
 
-    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\add1707.xlsx")
+    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\add0108.xlsx")
     data = ruExtr.extract(data, "Название клиента")
     data = engExtr.extract(data, "Название клиента")
 

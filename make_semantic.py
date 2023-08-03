@@ -66,15 +66,15 @@ if __name__ == "__main__":
     counts = CountsNoExtractor(excludeRX=True)
 
     # data = upload("farmaimpex.xlsx")
-    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\semantic_txt.xlsx")
-    data = ruExtr.extract(data, "Название")
-    data = engExtr.extract(data, "Название")
-    data = counts.extract(data, "Название")
+    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\semantic.xlsx")
+    data = ruExtr.extract(data, "name")
+    data = engExtr.extract(data, "name")
+    data = counts.extract(data, "name")
 
-    data = mass.extract(data, "Название")
-    data = liquid.extract(data, "Название")
-    data = ME.extract(data, "Название")
-    data = concMl.extract(data, "Название")
+    data = mass.extract(data, "name")
+    data = liquid.extract(data, "name")
+    data = ME.extract(data, "name")
+    data = concMl.extract(data, "name")
 
     data = concat_rx(data)
     # data = cross.extract(data, "Название")

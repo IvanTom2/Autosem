@@ -38,7 +38,7 @@ class RegexValidator(object):
         regex_column: str = "Regex",
         validate_by: str = "Строка валидации",
         semantic_merge_by: str = "Название",
-        validation_merge_by: str = "Название",
+        validation_merge_by: str = "Наименование",
     ) -> None:
         self._semantic = semantic
         self._validation = validation
@@ -144,8 +144,8 @@ class RegexValidator(object):
                 ]
             ],
             how="left",
-            left_on=self._semantic_merge_by,
-            right_on=self._validation_merge_by,
+            right_on=self._semantic_merge_by,
+            left_on=self._validation_merge_by,
         )
         val_data.index = range(len(val_data))
         return val_data
@@ -385,23 +385,26 @@ class RegexValidatorPro(RegexValidator):
 
 if __name__ == "__main__":
     semantic, validation = upload_data(
-        semantic_path=r"/home/mainus/BrandPol/semantic.xlsx",
-        validation_path=r"/home/mainus/BrandPol/validation.xlsx",
+        semantic_path=r"C:\Users\tomilov-iv\Desktop\KATREN\Ozon\semantic_EAN.xlsx",
+        validation_path=r"C:\Users\tomilov-iv\Desktop\KATREN\Ozon\Неправильные сопоставления\valid.xlsx",
     )
 
-    rx = RegexValidatorPro(
-        semantic,
-        validation,
-        plus_weight=1,
-        minus_weight=1,
-        regex_weight=1,
-        use_fuzzy=[MinusFuzzy],
-        strict=[PlusStrict],
-    )
-    val = rx.validate()
-
-    # regex_validator = RegexValidator(semantic, validation)
-    # validation = regex_validator.validate()
+    # print(semantic)
     # print(validation)
 
-    # validation.to_excel('validated.xlsx', index=False)
+    # rx = RegexValidatorPro(
+    #     semantic,
+    #     validation,
+    #     plus_weight=1,
+    #     minus_weight=1,
+    #     regex_weight=1,
+    #     use_fuzzy=[MinusFuzzy],
+    #     strict=[PlusStrict],
+    # )
+    # val = rx.validate()
+
+    regex_validator = RegexValidator(semantic, validation)
+    validation = regex_validator.validate()
+    # print(validation)
+
+    validation.to_excel("validated.xlsx", index=False)

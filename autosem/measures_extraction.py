@@ -303,18 +303,12 @@ class SizeExtractor(Extractor):
         self.triple_from_double = triple_from_double
         self.triple_from_double_pos = triple_from_double_pos
 
-        self._deterime_colnames()
-
-    def _deterime_colnames(self):
-        self._doub = "double"
-        self._doub_rx = "double_rx"
-        self._trip = "triple"
-        self._trip_rx = "triple_rx"
+        self._name = "_extr"
 
     def _show_status(self):
         print("Извлекаю размеры")
 
-    def _extract_size_values(self, series: pd.Series) -> pd.Series:
+    def _extract_size_values(self, df: pd.DataFrame, col: str) -> pd.DataFrame:
         if self.basic_sep:
             sep = r"\D+"
         else:
@@ -324,10 +318,14 @@ class SizeExtractor(Extractor):
         rx_double = rf"({_int})(?:{sep})({_int})"
         rx_triple = rf"({_int})(?:{sep})({_int})(?:{sep})({_int})"
 
-        double = series.str.findall(rx_double).str[0]
-        triple = series.str.findall(rx_triple).str[0]
+        df[self._name] = df[col].str.findall(rx_triple).str[0]
+        df[self._name] = np.where(
+            df[self._name].isna(),
+            df[col].str.findall(rx_double).str[0],
+            df[self._name],
+        )
 
-        return double, triple
+        return df
 
     def _triple_from_double(self, data: pd.DataFrame) -> pd.DataFrame:
         def get_values(series: pd.Series) -> pd.Series:
@@ -365,18 +363,21 @@ class SizeExtractor(Extractor):
             value = str(value)
         return value
 
-    def _create_doub_rx(self, values: tuple[int]) -> str:
+    def _create_rx(self, values: tuple[int]) -> str:
         rx = ""
+        kfs = [self._kf1, 1, self._kf2]
+
         if isinstance(values, tuple):
-            kfs = [self._kf1, 1, self._kf2]
-            for ind in range(len(kfs)):
-                kf = kfs[ind]
-                v1 = self._prep_value(values[0], kf)
-                v2 = self._prep_value(values[1], kf)
-                _rx = rf"\D{v1}\D+{v2}\D"
-                _sep = "|" if ind < len(kfs) - 1 else ""
+            for kf_ind in range(len(kfs)):
+                _rx = "\D"
+                kf = kfs[kf_ind]
+                for val_ind in range(len(values)):
+                    val = self._prep_value(values[val_ind], kf)
+                    val_end = "\D+" if val_ind < len(values) - 1 else "\D"
+                    _rx += rf"{val}{val_end}"
+
+                _sep = "|" if kf_ind < len(kfs) - 1 else ""
                 rx += _rx + _sep
-            rx = "(" + rx + ")"
 
         return rx
 
@@ -398,20 +399,14 @@ class SizeExtractor(Extractor):
         return rx
 
     def _create_size_rx(self, data: pd.DataFrame) -> pd.DataFrame:
-        data[self._doub_rx] = data[self._doub].apply(self._create_doub_rx)
-        data[self._trip_rx] = data[self._trip].apply(self._create_trip_rx)
-        data["Sizes"] = (
-            "(?=.*(" + data[self._doub_rx] + "|" + data[self._trip_rx] + "))"
-        )
+        data[self._name] = data[self._name].apply(self._create_rx)
+        data["Sizes"] = "(?=.*(" + data[self._name] + "))"
         return data
 
     def _clean_up(self, data: pd.DataFrame) -> pd.DataFrame:
         data = data.drop(
             [
-                self._doub,
-                self._doub_rx,
-                self._trip,
-                self._trip_rx,
+                self._name,
             ],
             axis=1,
         )
@@ -422,13 +417,19 @@ class SizeExtractor(Extractor):
             data["Sizes"],
         )
 
+        data["Sizes"] = np.where(
+            data["Sizes"] == "(?=.*())",
+            "",
+            data["Sizes"],
+        )
+
         return data
 
     def extract(self, data: pd.DataFrame, col: str) -> pd.DataFrame:
         self._show_status()
 
-        data[self._doub], data[self._trip] = self._extract_size_values(data[col])
-        data = self._triple_from_double(data)
+        data = self._extract_size_values(data, col)
+        # data = self._triple_from_double(data) # TODO: rework it
         data = self._create_size_rx(data)  # ["Размеры"]
         data = self._clean_up(data)
 

@@ -52,6 +52,6 @@ if __name__ == "__main__":
     data = counts.extract(data, "Название")
 
     data = concat_rx(data)
-    data = crosser.extract(data, "Название")
+    # data = crosser.extract(data, "Название")
 
     save(data, "farmaimpex.xlsx")
