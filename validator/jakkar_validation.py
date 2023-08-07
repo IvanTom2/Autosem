@@ -636,34 +636,32 @@ if __name__ == "__main__":
     #     validation_path=r"C:\Users\tomilov-iv\Desktop\BrandPol\raw.xlsx",
     # )
 
-    semantic = pd.read_excel(
-        r"C:\Users\tomilov-iv\Desktop\ReadTown\NeKnigi\Rework v2\semantic\TextSearch\_Text_v3.xlsx"
-    )
-    validation = pd.read_excel(
-        r"C:\Users\tomilov-iv\Desktop\ReadTown\NeKnigi\Rework v2\validation\validation_text_v2_p1.xlsx"
-    )
+    # semantic = pd.read_excel(
+    #     r"C:\Users\tomilov-iv\Desktop\ReadTown\NeKnigi\Rework v2\semantic\TextSearch\_Text_v3.xlsx"
+    # )
+    validation = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\raw.xlsx")
 
-    sem_columns = [
-        "Поисковый запрос",
-        "Название",
-        "Название клиента",
-        "Ссылка на фото",
-        "type",
-    ]
+    # sem_columns = [
+    #     "Поисковый запрос",
+    #     "Название",
+    #     "Название клиента",
+    #     "Ссылка на фото",
+    #     "type",
+    # ]
 
-    merged = pd.merge(
-        validation,
-        semantic[sem_columns],
-        how="left",
-        left_on="Запрос",
-        right_on="Поисковый запрос",
-    )
+    # merged = pd.merge(
+    #     validation,
+    #     semantic[sem_columns],
+    #     how="left",
+    #     left_on="Запрос",
+    #     right_on="Поисковый запрос",
+    # )
 
     # validation = validation[:10]
 
     result = validator.validate(
-        merged,
-        client_column="Название клиента",
+        validation,
+        client_column="Название клиент",
         site_column="Строка валидации",
     )
 
@@ -672,4 +670,4 @@ if __name__ == "__main__":
     # print("Precision =", round(precision_score(result["MyMark"], result["_mark"]), 4))
     # print("Recall =", round(recall_score(result["MyMark"], result["_mark"]), 4))
 
-    result.to_csv("neknigi_jakkar_output1.csv", index=False, sep=";")
+    result.to_excel("katren_jakkar.xlsx", index=False)
