@@ -16,6 +16,7 @@ from sklearn.metrics import (
     accuracy_score,
 )
 
+import time
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -602,6 +603,8 @@ class FuzzyJakkarValidator(object):
 
 
 if __name__ == "__main__":
+    start = time.time()
+
     weights_rules = RegexCustomWeights(
         caps=1,
         capital=1,
@@ -631,33 +634,9 @@ if __name__ == "__main__":
         multiple_marks=True,
     )
 
-    # semantic, validation = upload_data(
-    #     # semantic_path="/home/mainus/BrandPol/validator/semantic.csv",
-    #     validation_path=r"C:\Users\tomilov-iv\Desktop\BrandPol\raw.xlsx",
-    # )
-
-    # semantic = pd.read_excel(
-    #     r"C:\Users\tomilov-iv\Desktop\ReadTown\NeKnigi\Rework v2\semantic\TextSearch\_Text_v3.xlsx"
-    # )
-    validation = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\raw.xlsx")
-
-    # sem_columns = [
-    #     "Поисковый запрос",
-    #     "Название",
-    #     "Название клиента",
-    #     "Ссылка на фото",
-    #     "type",
-    # ]
-
-    # merged = pd.merge(
-    #     validation,
-    #     semantic[sem_columns],
-    #     how="left",
-    #     left_on="Запрос",
-    #     right_on="Поисковый запрос",
-    # )
-
-    # validation = validation[:10]
+    validation = pd.read_excel(
+        r"C:\Users\tomilov-iv\Desktop\VKUSVILL\VKUSVILL\rework v2\valid\raw.xlsx"
+    )
 
     result = validator.validate(
         validation,
@@ -670,4 +649,4 @@ if __name__ == "__main__":
     # print("Precision =", round(precision_score(result["MyMark"], result["_mark"]), 4))
     # print("Recall =", round(recall_score(result["MyMark"], result["_mark"]), 4))
 
-    result.to_excel("katren_jakkar.xlsx", index=False)
+    result.to_excel("vkusvill_jakkar.xlsx", index=False)

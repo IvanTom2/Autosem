@@ -386,11 +386,8 @@ class RegexValidatorPro(RegexValidator):
 if __name__ == "__main__":
     semantic, validation = upload_data(
         semantic_path=r"C:\Users\tomilov-iv\Desktop\KATREN\Ozon\semantic_EAN.xlsx",
-        validation_path=r"C:\Users\tomilov-iv\Desktop\KATREN\Ozon\Неправильные сопоставления\valid.xlsx",
+        validation_path=r"C:\Users\tomilov-iv\Desktop\KATREN\Ozon\valid\val3\ean_counts.xlsx",
     )
-
-    # print(semantic)
-    # print(validation)
 
     # rx = RegexValidatorPro(
     #     semantic,
@@ -403,7 +400,12 @@ if __name__ == "__main__":
     # )
     # val = rx.validate()
 
-    regex_validator = RegexValidator(semantic, validation)
+    regex_validator = RegexValidator(
+        semantic,
+        validation,
+        semantic_merge_by="Название",
+        validation_merge_by="Строка валидации",
+    )
     validation = regex_validator.validate()
     # print(validation)
 

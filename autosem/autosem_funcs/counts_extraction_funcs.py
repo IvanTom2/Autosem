@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import re
 
 
@@ -10,7 +11,7 @@ def extractCounts(
 
     countsValues = series.str.findall(rx, flags=re.IGNORECASE)
     countsValues = countsValues.apply(
-        lambda _counts: [count for count in _counts if count != "1"]
+        lambda _counts: [count for count in _counts if str(count) != "1"]
     )
     return countsValues
 

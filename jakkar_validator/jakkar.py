@@ -159,9 +159,11 @@ class FuzzyJakkarValidator(object):
 
 
 if __name__ == "__main__":
-    data = pd.read_excel(
-        r"C:\Users\tomilov-iv\Desktop\BrandPol\jakkar_validator\test_data.xlsx"
-    )
+    # data = pd.read_excel(
+    #     r"C:\Users\tomilov-iv\Desktop\BrandPol\jakkar_validator\test_data.xlsx"
+    # )
+
+    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol\raw.xlsx")
 
     index = indexer()
     weights_rules = RegexCustomWeights(caps=1, capital=1, low=1, other=1, symbols="")

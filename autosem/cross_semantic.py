@@ -186,6 +186,7 @@ class CrosserPro(Crosser):
     - make_cross_intersect - run cross-intersect operation
     - delete_rx - if you want do delete elements by rx
     (in this case dataframe should contains 'regex' column)
+    - process_nearest - sort and process nearest N left and right rows
     """
 
     def __init__(
@@ -194,6 +195,7 @@ class CrosserPro(Crosser):
         make_cross_minus: bool = True,
         make_cross_intersect: bool = True,
         delete_rx: bool = True,
+        process_nearest: int = 0,
     ):
         BasicCrosser.__init__(self)
 
@@ -201,6 +203,7 @@ class CrosserPro(Crosser):
         self.make_cross_minus = make_cross_minus
         self.make_cross_intersect = make_cross_intersect
         self.delete_rx = delete_rx
+        self.process_nearest = process_nearest
 
         self.extractors = [WordsExtractor(rule) for rule in self.rules]
 
@@ -221,10 +224,24 @@ class CrosserPro(Crosser):
         data = self._del_rx(data, col)
         data = self.get_tokens_pro(data, "row", self.extractors)
 
-        indexes = set(data.index)
-        for index in tqdm(indexes):
+        if self.process_nearest:
+            data = data.sort_values(by=[col])
+
+        indexes = list(data.index)
+        for pos_index in tqdm(range(len(indexes))):
+            index = indexes[pos_index]
             current_set = data.at[index, "tokens"]
-            rest_indexes = indexes - set([index])  # can be profiled
+
+            rest_indexes = indexes[:]  # or use copy.copy(indexess)
+            if self.process_nearest:
+                rest_indexes = indexes[
+                    max(0, pos_index - self.process_nearest) : min(
+                        len(indexes), pos_index + self.process_nearest + 1
+                    )
+                ]
+
+            if index in rest_indexes:
+                rest_indexes.remove(index)  # can be profiled?
 
             for rest_index in rest_indexes:
                 other_set = data.at[rest_index, "tokens"]

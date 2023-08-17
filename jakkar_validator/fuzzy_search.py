@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from tokenization import Token
 from fuzzywuzzy import fuzz
 import pandas as pd
+from tqdm import tqdm
 
 
 class AbstractFuzzySearcher(ABC):
@@ -41,7 +42,7 @@ class FuzzySearcher(AbstractFuzzySearcher):
         left_tokens: set = set().union(*left_tokens.to_list())  # set of client tokens
         right_tokens: set = set().union(*right_tokens.to_list())  # set of site tokens
 
-        for left_token in left_tokens:
+        for left_token in tqdm(left_tokens):
             self._search_similar(left_token, right_tokens)
 
         return left_tokens.union(right_tokens)

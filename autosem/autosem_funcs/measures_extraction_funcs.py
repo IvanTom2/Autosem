@@ -2,6 +2,7 @@ import pandas as pd
 import math
 from collections import namedtuple
 import re
+from decimal import Decimal
 
 
 Measure = namedtuple(
@@ -147,11 +148,10 @@ def extractMeasureValues(
 def createMeasureRX(measureValues: pd.Series, nGram: MeasureNGram):
     def transform(values, nGram):
         def prepValue(value):
-            if value >= 1:
-                # TODO - хардкод - может привести к ошибкам
-                value = re.sub(r"\.0$", "", str(value))
-            else:
-                value = str(value)
+            value = format(float(value), ".12f")
+            value = re.sub(r"\.0+$", "", value)
+            if "." in value:
+                value = value.rstrip("0")
 
             value = value.replace(".", "[,.]")
             return "\D" + value
@@ -160,10 +160,7 @@ def createMeasureRX(measureValues: pd.Series, nGram: MeasureNGram):
         for value in values:
             measure_rx = "(?=.*("
             for measure in nGram.Measures:
-                val = value / measure.ratio
-                if math.isclose(val, round(val)):
-                    val = round(val)
-
+                val = Decimal(str(value)) / Decimal(str(measure.ratio))
                 measure_rx += _makeDefaultRX(measure, prepValue(val)) + "|"
 
             measure_rx = re.sub("\|$", "", measure_rx) + "))"

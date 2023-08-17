@@ -4,6 +4,7 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(__file__) + r"\autosem")
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from autosem.word_extraction import *
 from autosem.measures_extraction import *
@@ -13,7 +14,7 @@ from util import save, upload, concat_rx
 
 
 if __name__ == "__main__":
-    data = upload("farmaimpex.xlsx")
+    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol_old\НОВЫЕ.xlsx")
 
     ru = LanguageRules(
         "russian",
@@ -35,15 +36,13 @@ if __name__ == "__main__":
     crosser = CrosserPro(
         [ru, eng],
     )
-    counts = CountsNoExtractor(counts="шт|уп|доз|пак", NO="", excludeRX=True)
+    counts = CountsNoExtractor(counts="шт|уп|доз|пак", NO="x|n|№", excludeRX=True)
     MD = MeasuresData()
 
     mass = MeasureExtractor(MD.mass(), mode="triplet", max_values=1)
     liquid = MeasureExtractor(MD.liquid(), mode="overall", max_values=1)
     ME = MeasureExtractor(MD.ME(), mode="triplet", max_values=1)
-    concMl = MeasureExtractor(
-        MD.concentrationByMilliliter(), mode="overall", max_values=1
-    )
+    concMl = MeasureExtractor(MD.concByMilliliter(), mode="overall", max_values=1)
 
     data = mass.extract(data, "Название")
     data = liquid.extract(data, "Название")
@@ -54,4 +53,5 @@ if __name__ == "__main__":
     data = concat_rx(data)
     # data = crosser.extract(data, "Название")
 
-    save(data, "farmaimpex.xlsx")
+    data.to_excel("yan.xlsx", index=False)
+    # save(data, "farmaimpex.xlsx")
