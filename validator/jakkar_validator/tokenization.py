@@ -4,7 +4,6 @@ from nltk.tokenize import word_tokenize
 from collections import namedtuple
 import sys
 import os
-import types
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

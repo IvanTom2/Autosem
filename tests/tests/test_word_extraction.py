@@ -1,10 +1,12 @@
-import os
+"""
+Don't have enough time to write enough pytests
+"""
 import sys
+from pathlib import Path
 
-username = os.getlogin()
-sys.path.append(f"/home/{username}/BrandPol/autosem_v2/")
+sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from autosem_funcs.word_extraction_funcs import *
+from autosem.autosem_funcs.word_extraction_funcs import *
 from data_for_tests import *
 
 

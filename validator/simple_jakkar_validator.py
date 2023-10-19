@@ -1,3 +1,8 @@
+"""
+Old version of fuzzy-jakkar validator.
+New version is available by link: https://github.com/IvanTom2/FTS
+"""
+
 import pandas as pd
 import re
 import sys
@@ -9,13 +14,6 @@ from itertools import chain
 from tqdm.auto import tqdm
 from collections import namedtuple
 import numpy as np
-from sklearn.metrics import (
-    confusion_matrix,
-    precision_score,
-    recall_score,
-    accuracy_score,
-)
-
 import time
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -279,7 +277,7 @@ def upload_data(
 
 class FuzzyJakkarValidator(object):
     """
-    Reworked version of Microsoft Fuzzy Lookup.
+    Reworked version of Microsoft Fuzzy Lookup !conception.
 
     This class perform text comparison by rows.
     At first, this algorith search similar tokens between two rows by Levenstein distance.
@@ -643,10 +641,5 @@ if __name__ == "__main__":
         client_column="Название клиент",
         site_column="Строка валидации",
     )
-
-    # result["_mark"] = np.where(result["mark"] >= 0.7, 1, 0)
-    # print("Accuracy =", round(accuracy_score(result["MyMark"], result["_mark"]), 4))
-    # print("Precision =", round(precision_score(result["MyMark"], result["_mark"]), 4))
-    # print("Recall =", round(recall_score(result["MyMark"], result["_mark"]), 4))
 
     result.to_excel("vkusvill_jakkar.xlsx", index=False)
