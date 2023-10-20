@@ -218,6 +218,16 @@ class CrosserPro(Crosser):
         print("Извелечение слов по кросс-семантике")
 
     def extract(self, data: pd.DataFrame, col: str):
+        """
+        IF YOU USE delete_rx=True parameter YOU SHOULD concat_rx(data)
+        BEFORE RUN THIS METHOD
+
+        Return the dataframe with three extra columns:
+        1) cross-minus
+        2) cross-plus
+        3) cross-intersect
+        """
+
         self._show_status()
 
         data = self._setup(data)

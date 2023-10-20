@@ -20,7 +20,7 @@ class Language(object):
         elif self.language == "russian":
             letters = self.ru
         else:
-            raise ValueError("You should add this language to base")
+            raise ValueError("You should add this language to the base")
         return letters
 
     def get_letters(self):

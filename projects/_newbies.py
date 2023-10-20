@@ -1,20 +1,9 @@
-import pandas as pd
-import numpy as np
-import sys
-import os
-
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
-
-from autosem.word_extraction import *
-from autosem.measures_extraction import *
-from autosem.counts_extraction import *
-from autosem.cross_semantic import *
-from util import upload, save
+from template import *
 
 
 if __name__ == "__main__":
+    data = upload("newbies.xlsx")
+
     ru = LanguageRules(
         "russian",
         symbols="",
@@ -40,8 +29,7 @@ if __name__ == "__main__":
     ruExtr = WordsExtractor(ru, expand_spaces=True)
     engExtr = WordsExtractor(eng, expand_spaces=True)
 
-    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol_old\add1710.xlsx")
     data = ruExtr.extract(data, "Название клиента")
     data = engExtr.extract(data, "Название клиента")
 
-    data.to_excel("newbies_news.xlsx")
+    save(data, "newbies_out.xlsx")

@@ -73,10 +73,10 @@ def parse_rx(
 ) -> pd.DataFrame:
     data[new_col_name] = data[extract_col].str.findall(r"\(\?\=\.\*.*?\)\)+")
     data[new_col_name] = data[new_col_name].apply(
-        lambda rxs: [re.sub(r"\(\?\=\.\*\(", "", rx) for rx in rxs]
+        lambda rxs: [re.sub(r"\(\?\=\.\*\(", "", str(rx)) for rx in rxs]
     )
     data[new_col_name] = data[new_col_name].apply(
-        lambda rxs: [re.sub(r"\)\)$", "", rx) for rx in rxs]
+        lambda rxs: [re.sub(r"\)\)$", "", str(rx)) for rx in rxs]
     )
     return data
 

@@ -1,6 +1,9 @@
 import pandas as pd
 import sys
 import os
+import regex as re
+from typing import Union
+
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -12,7 +15,15 @@ from autosem.autosem_funcs.word_extraction_funcs import (
     deleteWords,
     extractWordsWithMultipleLangsLetters,
 )
-from common import Extractor, wordsCleaner, wordsFilter, wordsStemming, wordsJoin
+from common import (
+    Extractor,
+    wordsCleaner,
+    wordsFilter,
+    wordsStemming,
+    wordsJoin,
+    parse_rx,
+)
+from measures_extraction import MeasuresData
 
 
 class WordsExtractor(Extractor):
@@ -140,6 +151,64 @@ class StraightWordExtractor(Extractor):
 
         data.drop("_rows", axis=1, inplace=True)
         return data
+
+
+class ValuesExtractorByRx(Extractor):
+    """
+    measure_data: Union[str, MeasuresData] - can be str or MeasureData
+    max_values: int = 0 - it's constraint of extracted values by regex (filter regexes)
+    """
+
+    def __init__(
+        self,
+        measure_data: Union[str, MeasuresData],
+        max_values: int = 0,
+    ):
+        self.measure_data = measure_data
+        self.max_values = max_values
+
+    def _try_search(
+        self,
+        pattern: str,
+        string: str,
+    ) -> str:
+        output = ""
+        try:
+            output = re.search(pattern, string, flags=re.IGNORECASE)[0]
+        except Exception:
+            output = ""
+        finally:
+            return output.strip()
+
+    def _extract(self, row: pd.Series, col: str) -> pd.Series:
+        values = [
+            self._try_search(pattern, row[col]) for pattern in row["regex_extracted"]
+        ]
+        row["out"] = ";".join(values)
+        return row
+
+    def extract(
+        self,
+        data: pd.DataFrame,
+        col: str,
+    ) -> pd.Series:
+        if isinstance(self.measure_data, str):
+            measure_names = [self.measure_data]
+        else:
+            measure_names = [dct["name"] for dct in self.measure_data[1]]
+
+        regex = data[[col]]
+        regex["regex"] = data[measure_names[0]]
+        for measure_name in measure_names[1:]:
+            regex["regex"] += data[measure_name]
+        regex["regex"] = regex["regex"].fillna("")
+
+        regex = parse_rx(regex, "regex", "regex_extracted")
+        if self.max_values:
+            regex["regex_extracted"] = regex["regex_extracted"].str[: self.max_values]
+
+        regex = regex.apply(self._extract, axis=1, args=(col,))
+        return regex["out"]
 
 
 if __name__ == "__main__":

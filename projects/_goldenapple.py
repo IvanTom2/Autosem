@@ -1,23 +1,8 @@
-import pandas as pd
-import numpy as np
-import sys
-import os
-
-sys.path.append(os.path.dirname(__file__) + r"\autosem")
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
-
-from autosem.word_extraction import *
-from autosem.measures_extraction import *
-from autosem.counts_extraction import *
-from autosem.cross_semantic import *
-from util import save, upload, concat_rx
+from template import *
 
 
 if __name__ == "__main__":
-    data = pd.read_excel(
-        r"C:\Users\tomilov-iv\Desktop\BrandPol_old\lithuania_kaina24_sem.xlsx"
-    )
+    data = upload("goldapp.xlsx")
 
     ru = LanguageRules(
         "russian",
@@ -64,4 +49,4 @@ if __name__ == "__main__":
     data = concat_rx(data)
     data = crosser.extract(data, COLUMN)
 
-    data.to_excel("test_RD.xlsx", index=False)
+    save(data, "goldapp_out.xlsx")

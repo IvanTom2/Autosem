@@ -1,20 +1,8 @@
-import pandas as pd
-import numpy as np
-import sys
-import os
-
-sys.path.append(os.path.dirname(__file__) + r"\autosem")
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
-from autosem.word_extraction import *
-from autosem.measures_extraction import *
-from autosem.counts_extraction import *
-from autosem.cross_semantic import *
-from util import save, upload, concat_rx
+from template import *
 
 
 if __name__ == "__main__":
-    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\BrandPol_old\НОВЫЕ.xlsx")
+    data = upload("farmaimpex.xlsx")
 
     ru = LanguageRules(
         "russian",
@@ -23,8 +11,19 @@ if __name__ == "__main__":
         min_lenght=3,
         stemming=True,
         symbols="",
+        max_words=1,
     )
-    eng = LanguageRules(
+
+    ru_cross = LanguageRules(
+        "russian",
+        check_letters=True,
+        with_numbers=True,
+        min_lenght=3,
+        stemming=True,
+        symbols="",
+    )
+
+    eng_cross = LanguageRules(
         "english",
         check_letters=True,
         with_numbers=True,
@@ -33,25 +32,33 @@ if __name__ == "__main__":
         symbols="",
     )
 
-    crosser = CrosserPro(
-        [ru, eng],
-    )
-    counts = CountsNoExtractor(counts="шт|уп|доз|пак", NO="x|n|№", excludeRX=True)
     MD = MeasuresData()
+    crosser = CrosserPro([ru_cross, eng_cross])
 
-    mass = MeasureExtractor(MD.mass(), mode="triplet", max_values=1)
-    liquid = MeasureExtractor(MD.liquid(), mode="overall", max_values=1)
-    ME = MeasureExtractor(MD.ME(), mode="triplet", max_values=1)
-    concMl = MeasureExtractor(MD.concByMilliliter(), mode="overall", max_values=1)
+    counts = CountsNoExtractor(counts="шт|уп|доз|пак", NO="x|n|№", excludeRX=True)
+    mass = MeasureExtractor(MD.mass, mode="triplet", max_values=1)
+    liquid = MeasureExtractor(MD.liquid, mode="overall", max_values=1)
+    ME = MeasureExtractor(MD.ME, mode="triplet", max_values=1)
+    concMl = MeasureExtractor(MD.concByMilliliter, mode="overall", max_values=1)
 
+    data = counts.extract(data, "Название")
     data = mass.extract(data, "Название")
     data = liquid.extract(data, "Название")
     data = ME.extract(data, "Название")
     data = concMl.extract(data, "Название")
-    data = counts.extract(data, "Название")
+
+    words_extractor = WordsExtractor(ru, expand_spaces=True)
+    ru_words = words_extractor.extract(data, "Название", "series")
+
+    weights_value_extractor = ValuesExtractorByRx(MD.mass, 1)
+    counts_value_extractor = ValuesExtractorByRx("Количество (№)", 1)
+
+    weights_values = weights_value_extractor.extract(data, "Название")
+    counts_values = counts_value_extractor.extract(data, "Название")
+
+    data["Поисковой запрос"] = ru_words + " " + weights_values + " " + counts_values
 
     data = concat_rx(data)
-    # data = crosser.extract(data, "Название")
+    data = crosser.extract(data, "Название")
 
-    data.to_excel("yan.xlsx", index=False)
-    # save(data, "farmaimpex.xlsx")
+    save(data, "farmaimpex_out.xlsx")

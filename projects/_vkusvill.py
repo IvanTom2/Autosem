@@ -1,36 +1,37 @@
-import pandas as pd
-import numpy as np
-import sys
-import os
+from template import *
 
-sys.path.append(os.path.dirname(__file__) + r'\autosem')
+if __name__ == "__main__":
+    data = upload("vkusvill.xlsx")
 
-from autosem.word_extraction import *
-from autosem.measures_extraction import *
-from autosem.counts_extraction import *
-from autosem.cross_semantic import *
-from util import save, upload, concat_rx
+    ru = LanguageRules(
+        "russian",
+        check_letters=True,
+        with_numbers=True,
+        min_lenght=3,
+        stemming=True,
+    )
+    eng = LanguageRules(
+        "english",
+        check_letters=True,
+        with_numbers=True,
+        min_lenght=3,
+        stemming=True,
+    )
 
-
-if __name__ == '__main__':
-    data = upload('vkusvill.xlsx')
-
-    ru = LanguageRules('russian', check_letters=True, with_numbers=True, min_lenght=3, stemming=True)
-    eng = LanguageRules('english', check_letters=True, with_numbers=True, min_lenght=3, stemming=True)
-
-    crosser = CrosserPro([ru, eng], main_rule=0)
+    crosser = CrosserPro([ru, eng])
     MD = MeasuresData()
 
+    counts = CountsExtractor(counts="шт|пач|уп|бан|x|х", NO="x|n|№", excludeRX=True)
     mass = MeasureExtractor(MD.mass())
     liquid = MeasureExtractor(MD.liquid())
-    percent = MeasureExtractor(MD.percentConcentration())
+    percent = MeasureExtractor(MD.concPercent())
 
-    data = mass.extract(data, 'Название')
-    data = liquid.extract(data, 'Название')
-    data = percent.extract(data, 'Название')
-    data = getCountsRx(data, 'Название', counts='шт|пач|уп|бан|x|х', excludeRX=True)
+    data = mass.extract(data, "Название")
+    data = liquid.extract(data, "Название")
+    data = percent.extract(data, "Название")
+    data = counts.extract(data, "Название", excludeRX=True)
 
     data = concat_rx(data)
-    data = crosser.extract(data, 'Название')
+    data = crosser.extract(data, "Название")
 
-    save(data, 'vkusvill.xlsx')
+    save(data, "vkusvill.xlsx")

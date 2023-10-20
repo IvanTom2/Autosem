@@ -35,7 +35,7 @@ def createCountsRX(
 ) -> pd.Series:
     countsRX = countsValues.str[:1].str.join("").astype(str)
     countsRX = countsRX.where(
-        countsRX == "", r"(?=.*(\D" + countsRX + r"\s*?" + counts + "))"
+        countsRX == "", r"(?=.*(\D" + countsRX + r"\s*" + counts + "))"
     )
 
     return countsRX
@@ -51,11 +51,11 @@ def createNoCountsRX(
         countsRX == "",
         r"(?=.*(\D"
         + countsRX
-        + r"\s*?"
+        + r"\s*"
         + default_counts
         + "|"
         + No_counts
-        + r"\s*?"
+        + r"\s*"
         + countsRX
         + r"\D))",
     )
@@ -75,7 +75,7 @@ def createExcludeCountsRX(
     countsRX = countsValues.str[:1].str.join("").astype(str)
     countsRX = countsRX.where(
         countsRX != "",
-        r"(?!.*((?:[0-9][0-9]\d*?|[2-9]\d*?)\s*?" + counts + "))",
+        r"(?!.*((?:[0-9][0-9]\d*|[2-9]\d*?)\s*" + counts + "))",
     )
 
     countsRX = countsRX.where(countsRX.apply(fullmatch), "")
@@ -95,11 +95,11 @@ def createExcludeNoCountsRX(
     countsRX = countsValues.str[:1].str.join("").astype(str)
     countsRX = countsRX.where(
         countsRX != "",
-        r"(?!.*((?:[0-9][0-9]\d*?|[2-9]\d*?)\s*?"
+        r"(?!.*((?:[0-9][0-9]\d*|[2-9]\d*)\s*"
         + default_counts
         + "|"
         + No_counts
-        + r"(?:[0-9][0-9]\d*?|[2-9]\d*?)"
+        + r"(?:[0-9][0-9]\d*|[2-9]\d*)"
         + "))",
     )
 

@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore")
 class CountsExtractor(Extractor):
     """
     Extract counts from rows and make regex for them.
-    Example: 15 шт -> extract "15"
+    Example: 15 шт -> extract "15" and make rx with it
 
     - counts - counts feature for extracting through regex.
     - excludeRX - make special regex for rows where counts weren't extracted.
