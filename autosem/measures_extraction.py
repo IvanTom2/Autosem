@@ -132,7 +132,7 @@ class MeasuresData(object):
             },
             {
                 "name": "Литр",
-                "symbols": r"литр|л|liter|l",
+                "symbols": r"литр|л[^a-zа-я0-9]|liter|l[^a-zа-я0-9]",
                 "ratio": 1,
                 "prefix": prefix,
                 "postfix": postfix,
@@ -162,10 +162,10 @@ class MeasuresData(object):
             },
             {
                 "name": "Грамм",
-                "symbols": r"г|гр|грамм|g|gram",
+                "symbols": r"г[^a-zа-я0-9]|гр[^a-zа-я0-9]|грамм|g[^a-zа-я0-9]|gram",
                 "ratio": 0.001,
                 "prefix": prefix,
-                "postfix": "[. ]",
+                "postfix": postfix,
             },
             {
                 "name": "Килограмм",
@@ -207,6 +207,36 @@ class MeasuresData(object):
         ]
         return _name, measures_data
 
+    @property
+    def length(self):
+        _name = "Длина"
+        prefix = r""
+        postfix = r""
+        measures_data = [
+            {
+                "name": "Миллиметр",
+                "symbols": r"мм[^a-zа-я0-9]|миллиметр|mm[^a-zа-я0-9]|millimeter",
+                "ratio": 0.001,
+                "prefix": "",
+                "postfix": postfix,
+            },
+            {
+                "name": "Сантиметр",
+                "symbols": r"см[^a-zа-я0-9]|сантиметр|cm[^a-zа-я0-9]|centimeter",
+                "ratio": 0.01,
+                "prefix": prefix,
+                "postfix": postfix,
+            },
+            {
+                "name": "Метр",
+                "symbols": r"м[^a-zа-я0-9]|метр|m|meter",
+                "ratio": 1,
+                "prefix": prefix,
+                "postfix": postfix,
+            },
+        ]
+        return _name, measures_data
+
     def _getNames(self, measures):
         return [measure["name"] for measure in measures]
 
@@ -218,6 +248,7 @@ class MeasuresData(object):
             self.liquid,
             self.mass,
             self.ME,
+            self.length,
         ]
 
         names = []
@@ -292,7 +323,7 @@ class SizeExtractor(Extractor):
         basic_sep: bool = True,
         custom_sep: str = r"[\/\\xх]",
         left_step: float = 10,
-        right_step: float = 10,
+        right_step: float = 1,
         triple_from_double: bool = True,
         triple_from_double_pos: int = 0,
     ):
@@ -355,6 +386,7 @@ class SizeExtractor(Extractor):
         return val
 
     def _prep_value(self, value: str, kf: float) -> float:
+        value = re.sub(",", ".", value)
         value = self._recount(float(value) / kf)
         if value >= 1:
             # TODO - хардкод - может привести к ошибкам

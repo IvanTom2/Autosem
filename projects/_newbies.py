@@ -2,7 +2,8 @@ from template import *
 
 
 if __name__ == "__main__":
-    data = upload("newbies.xlsx")
+    # data = upload("newbies.xlsx")
+    data = pd.read_excel(r"C:\Users\tomilov-iv\Desktop\Autosem\add2211.xlsx")
 
     ru = LanguageRules(
         "russian",
@@ -32,4 +33,5 @@ if __name__ == "__main__":
     data = ruExtr.extract(data, "Название клиента")
     data = engExtr.extract(data, "Название клиента")
 
-    save(data, "newbies_out.xlsx")
+    # save(data, "newbies_out.xlsx")
+    data.to_excel("newbies.xlsx", index=False)
